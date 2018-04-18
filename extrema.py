@@ -68,7 +68,7 @@ def extrema(x):
 
     #if any horizontal line?
     if not np.any(dx):
-        return
+        return (xmax,imax,xmin,imin)
 
     #% Flat peaks? Put the middle element:
 
@@ -168,7 +168,41 @@ def extrema(x):
     for i in imin:
         xmin.append(x[i])
 
-    # TODO:// NaNs
+    # NaNs
+    imax = []
+    imin = []
+    if len(inan[0]) != 0:
+        for i in imax:
+            imax.append(indx[i])
+        for i in imin:
+            imin.append(indx[i])
 
     ###SAME SIZE AS X
-    
+    imax = np.reshape(imax,np.shape(xmax))
+    imin = np.reshape(imin, np.shape(xmin))
+
+    ## Sort in Descending Order
+    # xmax.sort()
+    # xmax = np.flip(xmax,axis=1)
+
+    #return indices of descending order sorting
+    inmax = np.argsort(-np.asarray(xmax))
+    temp_sort = []
+    temp_imax = []
+    for i in inmax:
+        temp_sort.append(xmax[i])
+        temp_imax.append(imax[i])
+    xmax = temp_sort
+    imax = temp_imax
+
+    inmin = np.argsort(np.asarray(xmin))
+    temp_sort = []
+    temp_imin = []
+    for i in inmin:
+        temp_sort.append(xmin[i])
+        temp_imin.append(imin[i])
+    xmin = temp_sort
+    imin = temp_imin
+
+
+    return (xmax,imax,xmin,imin)
