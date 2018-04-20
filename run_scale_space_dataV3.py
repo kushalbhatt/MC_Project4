@@ -1,3 +1,12 @@
+# % Copyright (c) 2016 Arizona State University
+# % All rights reserved.
+# % Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+# % 1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+# % 2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+# % 3. Neither the name of Arizona State University nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
+# %
+# % THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
 # % Obatin the Difference Of Gaussian for one dimension signal
 # % Skip the detail of the space theory
 # % Input:
@@ -10,7 +19,7 @@
 # %                                each cell is 2D array ((m-1) x k), the DoG data by the different gaussian sigma
 # %                                (each row data is a DoG data genereting by two different gaussian sigma)
 import numpy as np
-import gaussianFilteringbySigma
+from gaussianFilteringbySigma import *
 def run_scale_space_dataV3(data):
     samplingRatios = [1,2,4]
     gaussian_sigmas = [1,2,4,8,16]
@@ -26,8 +35,8 @@ def run_scale_space_dataV3(data):
         scale_step = [gaussian_sigmas[i] * np.power(2,1.0/4), gaussian_sigmas[i] * np.power(2,1.0/2),gaussian_sigmas[i] * np.power(2,3.0/4),gaussian_sigmas[i] * 2]
         for j in range(len(scale_step)):
 
-            if j==1:
-                if i==1:
+            if j==0:
+                if i==0:
                     L1 = sampled_data
                     L1_ver2 = L1
                     octave_sampled_data = sampled_data
@@ -44,13 +53,17 @@ def run_scale_space_dataV3(data):
             L2 = gaussianFilteringbySigma(octave_sampled_data,scale_step[j],len(octave_sampled_data))
             DoG = L2 - L1
             L1 = L2
+
+            #better if it is appended as a row each dog should be added as a row
             for x in DoG:
                 octave_DoG_data.append(x)
             for x in L2:
                 octave_original_data.append(x)
+            #print "Iteration i=", i, " j=", j,"\t DoG = ",DoG  #, ": \tOctave_DOG=", octave_DoG_data
 
         #not sure if this is right way of doing it....   i - th entry is to be added
+        print i,"th \tOctave_DOG:= ", octave_DoG_data
         DoG_data.append(octave_DoG_data)
         space_scale_data.append(octave_original_data)
 
-        return(DoG_data,space_scale_data)
+    return(DoG_data,space_scale_data)
