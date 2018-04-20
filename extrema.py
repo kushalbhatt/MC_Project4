@@ -22,7 +22,7 @@
 # %   See also EXTREMA2, MAX, MIN
 #
 # %   Written by
-# %   Lic. on Physics Carlos Adrián Vargas Aguilera
+# %   Lic. on Physics Carlos Adrian Vargas Aguilera
 # %   Physical Oceanography MS candidate
 # %   UNIVERSIDAD DE GUADALAJARA
 # %   Mexico, 2004
@@ -36,6 +36,7 @@
 # % 2006-11-17 : Accept NaN's.
 # % 2007-04-09 : Change name to MAXIMA, and definition added.
 
+'''NOTE: THis code might have off by one errors needs to be checked! '''
 import numpy as np
 import math
 def extrema(x):
@@ -90,9 +91,9 @@ def extrema(x):
     for l in lm:
         d = a[l] - a[l-1]
         #save middle elements
-        a[l] = a[l] - math.floor(d/2)
-
-    a.append(Nt)
+        a[l] = int(a[l] - math.floor(d/2))
+    #because indexing starts at 0... in matlab code it is 1
+    a.append(Nt-1)
 
 
     # PEAKS??
@@ -146,11 +147,11 @@ def extrema(x):
 
     """Maximum or minimum at the ends?"""
     if(nmaxi==0):
-        imax[0]=1
-        imax[1]=Nt
+        imax.insert(0, 1)
+        imax.insert(1,Nt-1)
     elif nmini==0:
-        imin[0]=1
-        imin[1]=Nt
+        imin.insert(0,1)
+        imin.insert(1,Nt-1)
     else:
         if imax[0]< imin[0]:
             #insert 1 at front
@@ -159,18 +160,19 @@ def extrema(x):
             imax.insert(0,1)
 
         if imax[-1] > imin[-1]:
-            imin.append(Nt)
+            imin.append(Nt-1)
         else:
-            imax.append(Nt)
+            imax.append(Nt-1)
 
     for i in imax:
         xmax.append(x[i])
+
     for i in imin:
         xmin.append(x[i])
 
     # NaNs
-    imax = []
-    imin = []
+    # imax = []
+    # imin = []
     if len(inan[0]) != 0:
         for i in imax:
             imax.append(indx[i])
@@ -206,3 +208,6 @@ def extrema(x):
 
 
     return (xmax,imax,xmin,imin)
+
+
+print extrema([10,11,20])
