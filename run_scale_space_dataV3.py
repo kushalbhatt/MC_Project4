@@ -64,7 +64,7 @@ def run_scale_space_dataV3(data):
             #print "Iteration i=", i, " j=", j,"\t DoG = ",DoG  #, ": \tOctave_DOG=", octave_DoG_data
 
         #not sure if this is right way of doing it....   i - th entry is to be added
-        print (i+1),":: \tOctave_DOG:= ", octave_DoG_data
+        #print (i+1),":: \tOctave_DOG:= ", octave_DoG_data
         DoG_data.append(octave_DoG_data)
         space_scale_data.append(octave_original_data)
 

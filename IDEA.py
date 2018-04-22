@@ -21,7 +21,11 @@ def main():
         IMU file has time stamp and 10 sensor values (Orientation W,X,Y,Z, Accelerometer X,Y,Z, and Gyroscope X,Y,Z). 
 	    
 	    EMG sensor has time stamp and 8 EMG pods value.
+        Below written code is functional but not the most elegant
+        Kept it seimple for easy of writing and understanding
+        Can be improved and zipped to less lines of code
     """
+
     #for i in range(len(EMG_Files)):
     sensor1=[]
     sensor2 = []
@@ -41,7 +45,6 @@ def main():
     sensor16 = []
     sensor17 = []
     sensor18 = []
-
 
 
     f = open("K:/ASU/MC/project_data/"+EMG_Files[0], 'r')
@@ -86,35 +89,50 @@ def main():
 
         s = f.readline()
 
-    '''Run scale-space data on this sensor values...'''
-
-
-
     print "Calculating scale space"
-    #x = [-5]
-    scale_space = run_scale_space_dataV3([5,1])
-    print "DoG Data = ",scale_space[0]
-    print "Scale Space = ", scale_space[1]
-    print "Total values =",(np.shape(scale_space[0])),np.shape(scale_space[1])
 
     '''Write the scale_space data to a csv file  
        Keep Name of the file same as input file name excluding EMG IMU
-       But I still I cna't understand the output of scale-space computation
-       It's not              27 values--  3 octave: each octave 5 scale, 4 DoG
-       It is super weird.'''
+    
+    csv file name would be same as sensor data file name.... except for EMG and IMU parts...
+
+    '''
+    output_filename = EMG_Files[0][:-8]#EMG.txt
+
+    write_scale_space_to_file(output_filename,sensor1)
+    write_scale_space_to_file(output_filename, sensor2)
+    write_scale_space_to_file(output_filename, sensor3)
+    write_scale_space_to_file(output_filename, sensor4)
+    write_scale_space_to_file(output_filename, sensor5)
+    write_scale_space_to_file(output_filename, sensor6)
+    write_scale_space_to_file(output_filename, sensor7)
+    write_scale_space_to_file(output_filename, sensor8)
+    write_scale_space_to_file(output_filename, sensor9)
+    write_scale_space_to_file(output_filename, sensor10)
+    write_scale_space_to_file(output_filename, sensor11)
+    write_scale_space_to_file(output_filename, sensor12)
+    write_scale_space_to_file(output_filename, sensor13)
+    write_scale_space_to_file(output_filename, sensor14)
+    write_scale_space_to_file(output_filename, sensor15)
+    write_scale_space_to_file(output_filename, sensor16)
+    write_scale_space_to_file(output_filename, sensor17)
+    write_scale_space_to_file(output_filename, sensor18)
+
+
+def write_scale_space_to_file(filename,sensor_data):
+    scale_space = run_scale_space_dataV3(sensor_data)
+    myFile = open(filename + '.csv', 'ab+')  # append data for all sensors
+    # print "DoG Data = ",scale_space[0]
+    # print "Scale Space = ", scale_space[1]
+    # print "Total values =",(np.shape(scale_space[0])),np.shape(scale_space[1])
 
     #Code for writing data to a csv file
-    #in our case write octave wise  (But then it is not even 27 values)
-    testData = [["first_name", "second_name", "Grade"],
-              ['Alex', 'Brian', 'A'],
-              ['Tom', 'Smith', 'B']]
-
-
-    myFile = open('test.csv', 'ab+')#append data for all sensors
-
     with myFile:
         writer = csv.writer(myFile)
         writer.writerows(scale_space)
-    print("Writing complete")
+    myFile.close()
+    #print("Writing complete")
+
+
 if __name__ == "__main__":
     main()
