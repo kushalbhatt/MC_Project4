@@ -3,6 +3,7 @@ import csv
 import numpy as np
 from keras.models import Sequential
 from keras.layers import Dense, Dropout
+from keras.utils import plot_model
 '''
 #trainfilename will look like 487 column matrix, where last row is y
 #tranfilename will be all donors combined, eat vs eat and eat vs non-eat
@@ -45,11 +46,13 @@ model.compile(loss='binary_crossentropy',
 
 model.fit(x_train, y_train,
 		  epochs=20,
-		  batch_size=64git )
+		  batch_size=64)
 #In general: Larger batch sizes result in faster progress in training, but don't always converge as fast. Smaller batch sizes train slower, but can converge faster. It's definitely problem dependent.
 #In general, the models improve with more epochs of training, to a point. They'll start to plateau in accuracy as they converge. Try something like 50 and plot number of epochs (x axis) vs. accuracy (y axis). You'll see where it levels out.
 #batch size defines number of samples that going to be propagated through the network.
-score = model.predict(x_test, batch_size=None, verbose=1,steps=None) #predict(self, x, batch_size=None, verbose=0, steps=None)
+score = model.predict(x_test, batch_size=None, verbose=0,steps=None) #predict(self, x, batch_size=None, verbose=0, steps=None)
+
+plot_model(model,to_file="model.png",show_shapes = True)
 #x: The input data, as a Numpy array (or list of Numpy arrays if the model has multiple outputs).
 #batch_size: Integer. If unspecified, it will default to 32.
 #verbose: Verbosity mode, 0 or 1.
