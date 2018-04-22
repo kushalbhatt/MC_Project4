@@ -109,11 +109,12 @@ def main():
               ['Alex', 'Brian', 'A'],
               ['Tom', 'Smith', 'B']]
 
-    myFile = open('test.csv', 'w')
+
+    myFile = open('test.csv', 'ab+')#append data for all sensors
+
     with myFile:
         writer = csv.writer(myFile)
         writer.writerows(scale_space)
-
     print("Writing complete")
 if __name__ == "__main__":
     main()
