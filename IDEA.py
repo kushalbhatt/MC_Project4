@@ -92,10 +92,10 @@ def main():
 
     print "Calculating scale space"
     #x = [-5]
-    scale_space = run_scale_space_dataV3(sensor1)
+    scale_space = run_scale_space_dataV3([5,1])
     print "DoG Data = ",scale_space[0]
     print "Scale Space = ", scale_space[1]
-    print "Total values=",(np.shape(scale_space[0])),np.shape(scale_space[1])
+    print "Total values =",(np.shape(scale_space[0])),np.shape(scale_space[1])
 
     '''Write the scale_space data to a csv file  
        Keep Name of the file same as input file name excluding EMG IMU
@@ -112,7 +112,7 @@ def main():
     myFile = open('test.csv', 'w')
     with myFile:
         writer = csv.writer(myFile)
-        writer.writerows(testData)
+        writer.writerows(scale_space)
 
     print("Writing complete")
 if __name__ == "__main__":

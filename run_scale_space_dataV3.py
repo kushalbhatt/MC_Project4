@@ -41,28 +41,30 @@ def run_scale_space_dataV3(data):
                     L1_ver2 = L1
                     octave_sampled_data = sampled_data
                     #appending each entry from (1 x P) array to octave_sampled_data as rows (P rows)
-                    for x in octave_sampled_data:
-                        octave_original_data.append(x)
+                    #for x in octave_sampled_data:
+                    octave_original_data.append(octave_sampled_data)
                 else:
                     L1 = L1[::2] #downsmaple
                     L1_ver2 = L1
                     octave_sampled_data = L1
-                    for x in octave_sampled_data:
-                        octave_original_data.append(x)
+                    # for x in octave_sampled_data:
+                    octave_original_data.append(octave_sampled_data.tolist())
 
             L2 = gaussianFilteringbySigma(octave_sampled_data,scale_step[j],len(octave_sampled_data))
             DoG = L2 - L1
             L1 = L2
 
             #better if it is appended as a row each dog should be added as a row
-            for x in DoG:
-                octave_DoG_data.append(x)
-            for x in L2:
-                octave_original_data.append(x)
+            octave_DoG_data.append(DoG.tolist())
+            # for x in DoG:
+            #     octave_DoG_data.append(x)
+            octave_original_data.append(L2.tolist())
+            # for x in L2:
+            #     octave_original_data.append(x)
             #print "Iteration i=", i, " j=", j,"\t DoG = ",DoG  #, ": \tOctave_DOG=", octave_DoG_data
 
         #not sure if this is right way of doing it....   i - th entry is to be added
-        print i,"th \tOctave_DOG:= ", octave_DoG_data
+        print (i+1),":: \tOctave_DOG:= ", octave_DoG_data
         DoG_data.append(octave_DoG_data)
         space_scale_data.append(octave_original_data)
 
