@@ -37,7 +37,7 @@ def run_DTW_Generation(dataPath, savePath, Subject, Reference):
 	CSV2Memory(dataPath + Reference + "_interpolate_norm_label.csv", Reference_Label, Reference_N_Label)
 	
 	SizeSet = [45, 23, 12]#each octave 1/2 each time (downscale)
-	DataSizeSet = [0, 405, 612]
+	DataSizeSet = [0, 405, 612]#45*9,43+23=68*9
 	DTW_feature = [][]#(float**)malloc(sizeof(float*) * Subject_N_Label*Reference_N_Label);
 	for i in range(0,Subject_N_Label*Reference_N_Label)
 		DTW_feature[i] = (float*)malloc(sizeof(float) * 34 * 3 * 9)
@@ -53,12 +53,12 @@ def run_DTW_Generation(dataPath, savePath, Subject, Reference):
 	for iCompare in range(0,Subject_N_Label*Reference_N_Label):#iterate through all subjects and references for compare
 			i = iCompare / Reference_N_Label
 			j = iCompare % Reference_N_Label
-			for iSensor in prange(0,34):#34 sensors
+			for iSensor in prange(0,18):#18 sensors
 				for iOctave in prange(0,3):#3 octaves per sensor
 					for iScale in prange(0,9):#9 values=4Dogs+5scale-space for each octave
-						#720*34=24480; 720??? 34???; this iterates through subjects and references
-						subject_idx = i * 24480 + iSensor * 720 + DataSizeSet[iOctave] + SizeSet[iOctave] * iScale
-						reference_idx = j * 24480 + iSensor * 720 + DataSizeSet[iOctave] + SizeSet[iOctave] * iScale
+						#720*34=24480; this iterates through subjects and references
+						subject_idx = i * 12960 + iSensor * 720 + DataSizeSet[iOctave] + SizeSet[iOctave] * iScale #9DoG and SS*80=45+23+12 = 720
+						reference_idx = j * 12960 + iSensor * 720 + DataSizeSet[iOctave] + SizeSet[iOctave] * iScale
 
 						subject_one=[45]
 						reference_one=[45]
@@ -79,11 +79,11 @@ def run_DTW_Generation(dataPath, savePath, Subject, Reference):
 	DTW_filename = save_filename
 	Out_File = open(DTW_filename)
 	for m in range(0,Subject_N_Label*Reference_N_Label):
-		for n in range(0,34 * 3 * 9):
+		for n in range(0,18 * 3 * 9):
 			#newer_method_string = "{:.9f}".format(numvar)
 			Out_File.write("{:.9f}".format(DTW_feature[m][n]))
 			#Out_File << fixed << setprecision(5) << DTW_feature[m][n];
-			if (n != 34 * 3 * 9 - 1):
+			if (n != 18 * 3 * 9 - 1):
 				Out_File.write(",")
 				#Out_File << ",";
 		Out_File.write("\n")
