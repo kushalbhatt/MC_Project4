@@ -3,7 +3,8 @@ from extrema import *
 from MinMaxNormalization import *
 import os
 import csv
-
+import scipy as sp
+from scipy import signal
 def main():
     # open all user sensor data files
     EMG_Files = []
@@ -49,8 +50,8 @@ def main():
     sensor18 = []
 
 
-    f = open("K:/ASU/MC/project_data/"+EMG_Files[5], 'r')
-    print "reading file = ",EMG_Files[5]
+    f = open("K:/ASU/MC/project_data/"+EMG_Files[9], 'r')
+    print "reading file = ",EMG_Files[9]
     s = f.readline()
     while(s):
         s = s.strip('\n')
@@ -70,7 +71,7 @@ def main():
 
         s = f.readline()
 
-    f = open("K:/ASU/MC/project_data/" + IMU_files[5], 'r')
+    f = open("K:/ASU/MC/project_data/" + IMU_files[9], 'r')
     s = f.readline()
     while (s):
         s = s.strip('\n')
@@ -99,7 +100,7 @@ def main():
     csv file name would be same as sensor data file name.... except for EMG and IMU parts...
 
     '''
-    output_filename = EMG_Files[5][:-8]#EMG.txt
+    output_filename = EMG_Files[9][:-8]#remove EMG.txt
 
     '''
         TODO://  This is where extrema based segmentation takes place!!!!!
@@ -144,31 +145,58 @@ def main():
 
     print "Performing Extrema Based Segmentation......"
 
-    extrema_points = extrema(sensor14)
-    print "max indices= ",len(extrema_points[1]),extrema_points[1]
-    print "min indices= ", extrema_points[3]
+    # extrema_points = extrema(sensor14)
+    # print "max indices= ", len(extrema_points[1]), extrema_points[1]
+    # print "max values= ", extrema_points[0]
+    # print "min indices= ", len(extrema_points[3]),extrema_points[3]
+    # print "min values= ", extrema_points[2]
 
-    print "Calculating scale space of segments"
+    """ Apply signal noise filtering to focus on important sensor data 
+        Use returned indices from the filtered_signal to find releavant points in main signal"""
 
-    #write_scale_space_to_file("test", [5,2])
-    # write_scale_space_to_file(output_filename,sensor1)
-    # write_scale_space_to_file(output_filename, sensor2)
-    # write_scale_space_to_file(output_filename, sensor3)
-    # write_scale_space_to_file(output_filename, sensor4)
-    # write_scale_space_to_file(output_filename, sensor5)
-    # write_scale_space_to_file(output_filename, sensor6)
-    # write_scale_space_to_file(output_filename, sensor7)
-    # write_scale_space_to_file(output_filename, sensor8)
-    # write_scale_space_to_file(output_filename, sensor9)
-    # write_scale_space_to_file(output_filename, sensor10)
-    # write_scale_space_to_file(output_filename, sensor11)
-    # write_scale_space_to_file(output_filename, sensor12)
-    # write_scale_space_to_file(output_filename, sensor13)
-    # write_scale_space_to_file(output_filename, sensor14)
-    # write_scale_space_to_file(output_filename, sensor15)
-    # write_scale_space_to_file(output_filename, sensor16)
-    # write_scale_space_to_file(output_filename, sensor17)
-    # write_scale_space_to_file(output_filename, sensor18)
+    filtered_signal = sp.signal.medfilt(sensor14, 101)
+    extrema_points = extrema(filtered_signal)
+    print "\n\nmax indices= ", len(extrema_points[1]), extrema_points[1]
+    print "max values= ", extrema_points[0]
+    print "min indices= ", len(extrema_points[3]), extrema_points[3]
+    print "min values= ", extrema_points[2]
+
+    """Right now for simplicity I am filtering out 5 segements and not all of them as the number is extremely huge for testing
+        First three are EAT, Last two are non-eat 
+    """
+
+    segments = [(2805,3026),(4114,4331),(1321,1523),(3197,3390),(2424,2803)] #manually tracked from sensor signal plot
+
+    for segment in segments:
+        #print sensor1[segment[0]:segment[1]],"\nlength = ",len(sensor1[segment[0]:segment[1]])
+        write_scale_space_to_file(output_filename,sensor1[segment[0]:segment[1]])
+        write_scale_space_to_file(output_filename, sensor2[segment[0]:segment[1]])
+        write_scale_space_to_file(output_filename, sensor3[segment[0]:segment[1]])
+        write_scale_space_to_file(output_filename, sensor4[segment[0]:segment[1]])
+        write_scale_space_to_file(output_filename, sensor5[segment[0]:segment[1]])
+        write_scale_space_to_file(output_filename, sensor6[segment[0]:segment[1]])
+        write_scale_space_to_file(output_filename, sensor7[segment[0]:segment[1]])
+        write_scale_space_to_file(output_filename, sensor8[segment[0]:segment[1]])
+        write_scale_space_to_file(output_filename, sensor9[segment[0]:segment[1]])
+        write_scale_space_to_file(output_filename, sensor10[segment[0]:segment[1]])
+        write_scale_space_to_file(output_filename, sensor11[segment[0]:segment[1]])
+        write_scale_space_to_file(output_filename, sensor12[segment[0]:segment[1]])
+        write_scale_space_to_file(output_filename, sensor13[segment[0]:segment[1]])
+        write_scale_space_to_file(output_filename, sensor14[segment[0]:segment[1]])
+        write_scale_space_to_file(output_filename, sensor15[segment[0]:segment[1]])
+        write_scale_space_to_file(output_filename, sensor16[segment[0]:segment[1]])
+        write_scale_space_to_file(output_filename, sensor17[segment[0]:segment[1]])
+        write_scale_space_to_file(output_filename, sensor18[segment[0]:segment[1]])
+    # import matplotlib.pyplot as plt
+    # plt.ylabel('sensor14')
+    # plt.subplot(2,1,1)
+    # plt.plot(sensor14)
+    #
+    # plt.ylabel('Filtered sensor14')
+    # plt.subplot(2, 1, 2)
+    # plt.plot(filtered_signal)
+    #
+    # plt.show()
 
 #debug code  delete later
 def readCSV():
@@ -180,18 +208,13 @@ def readCSV():
             print octave_1
 
 
-
-
-
 def write_scale_space_to_file(filename,sensor_data):
     (DoG,scale_space) = run_scale_space_dataV3(sensor_data)
     '''
             CSV Format:: 27 columns:  (5 scale-space + 4 DoG) x 3 octaves
                          scale-space first, dog second
                          First 9: Octave 1
-                         10-18: Octave 2
-                         
-                         
+                         10-18: Octave 2                                                 
     '''
     data = []
 
@@ -201,14 +224,7 @@ def write_scale_space_to_file(filename,sensor_data):
         for x in DoG[i]:
             data.append(x)
 
-    # data.append(DoG[0])
-    # data.append(DoG[1])
-    # data.append(DoG[2])
-    print data
     myFile = open(filename + '.csv', 'ab+')  # append data for all sensors
-    # print "DoG Data = ",scale_space[0]
-    # print "Scale Space = ", scale_space[1]
-    # print "Total values =",(np.shape(scale_space[0])),np.shape(scale_space[1])
 
     #Code for writing data to a csv file
     with myFile:
