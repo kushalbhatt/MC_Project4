@@ -98,7 +98,13 @@ def main():
 
     '''
     output_filename = EMG_Files[0][:-8]#EMG.txt
+    #write_scale_space_to_file("test", [5,2])
 
+    '''
+        TODO://  This is where extrema based segmentation takes place!!!!!
+        Find the segments from the sensor data and run scale-space on those segments
+        not on sensor signals directly...... 
+    '''
     write_scale_space_to_file(output_filename,sensor1)
     write_scale_space_to_file(output_filename, sensor2)
     write_scale_space_to_file(output_filename, sensor3)
@@ -120,7 +126,17 @@ def main():
 
 
 def write_scale_space_to_file(filename,sensor_data):
-    scale_space = run_scale_space_dataV3(sensor_data)
+    (DoG,scale_space) = run_scale_space_dataV3(sensor_data)
+    '''
+            CSV Format:: 3 columns: Each column having an octave data
+                         scale-space first, dog second
+    '''
+    data = []
+    data.append([scale_space[0],DoG[0]])#ocatve 1
+    data.append([scale_space[1], DoG[1]])#ocatve 2
+    data.append([scale_space[2], DoG[2]])#ocatve 3
+
+    print data
     myFile = open(filename + '.csv', 'ab+')  # append data for all sensors
     # print "DoG Data = ",scale_space[0]
     # print "Scale Space = ", scale_space[1]
@@ -129,7 +145,7 @@ def write_scale_space_to_file(filename,sensor_data):
     #Code for writing data to a csv file
     with myFile:
         writer = csv.writer(myFile)
-        writer.writerows(scale_space)
+        writer.writerow(data)
     myFile.close()
     #print("Writing complete")
 
