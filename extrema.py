@@ -210,4 +210,4 @@ def extrema(x):
     return (xmax,imax,xmin,imin)
 
 
-print extrema([10,10,10,20,10,10,20])
+#print extrema([10,10,10,20,10,10,20])

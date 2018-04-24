@@ -1,4 +1,6 @@
 from run_scale_space_dataV3 import *
+from extrema import *
+from MinMaxNormalization import *
 import os
 import csv
 
@@ -47,7 +49,8 @@ def main():
     sensor18 = []
 
 
-    f = open("K:/ASU/MC/project_data/"+EMG_Files[0], 'r')
+    f = open("K:/ASU/MC/project_data/"+EMG_Files[5], 'r')
+    print "reading file = ",EMG_Files[5]
     s = f.readline()
     while(s):
         s = s.strip('\n')
@@ -67,7 +70,7 @@ def main():
 
         s = f.readline()
 
-    f = open("K:/ASU/MC/project_data/" + IMU_files[0], 'r')
+    f = open("K:/ASU/MC/project_data/" + IMU_files[5], 'r')
     s = f.readline()
     while (s):
         s = s.strip('\n')
@@ -89,7 +92,6 @@ def main():
 
         s = f.readline()
 
-    print "Calculating scale space"
 
     '''Write the scale_space data to a csv file  
        Keep Name of the file same as input file name excluding EMG IMU
@@ -97,45 +99,111 @@ def main():
     csv file name would be same as sensor data file name.... except for EMG and IMU parts...
 
     '''
-    output_filename = EMG_Files[0][:-8]#EMG.txt
-    #write_scale_space_to_file("test", [5,2])
+    output_filename = EMG_Files[5][:-8]#EMG.txt
 
     '''
         TODO://  This is where extrema based segmentation takes place!!!!!
         Find the segments from the sensor data and run scale-space on those segments
-        not on sensor signals directly...... 
+        not on sensor signals directly......
+        
+        
+        Based on the plots drawn for different signals..........
+        Accelerometer Y,Z sensor values::::  
+        -------Sensor14 and Sensor 15  is very good for segmentation Clear maxima points visible-------
+        Gyroscope Z  sensor 18 is good
+        Orientation Y  Sensor 11 is not bad... 
+    
+        import matplotlib.pyplot as plt
+        plt.subplot(4,1,1)
+        plt.ylabel('sensor1')
+        plt.plot(sensor1)
+    
+        plt.subplot(4, 1, 2)
+        plt.ylabel('sensor2')
+        plt.plot(sensor2)
+    
+        """
+           """
+        plt.subplot(4, 1, 3)
+        plt.ylabel('sensor3')
+        plt.plot(sensor3)
+    
+        plt.subplot(4, 1, 4)
+        plt.ylabel('sensor14')
+        plt.plot(sensor14)
+        plt.show()
+
+        TODO://
+        Right now I will go with sensor 14 
+        1)get the extremas..... 
+        2)get the segments based on extrema information  
+        3)Interpolate those segments (Can skip for now)
+        4) 
+        and then run scale space on those segments.
     '''
-    write_scale_space_to_file(output_filename,sensor1)
-    write_scale_space_to_file(output_filename, sensor2)
-    write_scale_space_to_file(output_filename, sensor3)
-    write_scale_space_to_file(output_filename, sensor4)
-    write_scale_space_to_file(output_filename, sensor5)
-    write_scale_space_to_file(output_filename, sensor6)
-    write_scale_space_to_file(output_filename, sensor7)
-    write_scale_space_to_file(output_filename, sensor8)
-    write_scale_space_to_file(output_filename, sensor9)
-    write_scale_space_to_file(output_filename, sensor10)
-    write_scale_space_to_file(output_filename, sensor11)
-    write_scale_space_to_file(output_filename, sensor12)
-    write_scale_space_to_file(output_filename, sensor13)
-    write_scale_space_to_file(output_filename, sensor14)
-    write_scale_space_to_file(output_filename, sensor15)
-    write_scale_space_to_file(output_filename, sensor16)
-    write_scale_space_to_file(output_filename, sensor17)
-    write_scale_space_to_file(output_filename, sensor18)
+
+    print "Performing Extrema Based Segmentation......"
+
+    extrema_points = extrema(sensor14)
+    print "max indices= ",len(extrema_points[1]),extrema_points[1]
+    print "min indices= ", extrema_points[3]
+
+    print "Calculating scale space of segments"
+
+    #write_scale_space_to_file("test", [5,2])
+    # write_scale_space_to_file(output_filename,sensor1)
+    # write_scale_space_to_file(output_filename, sensor2)
+    # write_scale_space_to_file(output_filename, sensor3)
+    # write_scale_space_to_file(output_filename, sensor4)
+    # write_scale_space_to_file(output_filename, sensor5)
+    # write_scale_space_to_file(output_filename, sensor6)
+    # write_scale_space_to_file(output_filename, sensor7)
+    # write_scale_space_to_file(output_filename, sensor8)
+    # write_scale_space_to_file(output_filename, sensor9)
+    # write_scale_space_to_file(output_filename, sensor10)
+    # write_scale_space_to_file(output_filename, sensor11)
+    # write_scale_space_to_file(output_filename, sensor12)
+    # write_scale_space_to_file(output_filename, sensor13)
+    # write_scale_space_to_file(output_filename, sensor14)
+    # write_scale_space_to_file(output_filename, sensor15)
+    # write_scale_space_to_file(output_filename, sensor16)
+    # write_scale_space_to_file(output_filename, sensor17)
+    # write_scale_space_to_file(output_filename, sensor18)
+
+#debug code  delete later
+def readCSV():
+
+    with open('test.csv', 'rb') as f:
+        reader = csv.reader(f)
+        for row in reader:
+            octave_1 = row[0]
+            print octave_1
+
+
+
 
 
 def write_scale_space_to_file(filename,sensor_data):
     (DoG,scale_space) = run_scale_space_dataV3(sensor_data)
     '''
-            CSV Format:: 3 columns: Each column having an octave data
+            CSV Format:: 27 columns:  (5 scale-space + 4 DoG) x 3 octaves
                          scale-space first, dog second
+                         First 9: Octave 1
+                         10-18: Octave 2
+                         
+                         
     '''
     data = []
-    data.append([scale_space[0],DoG[0]])#ocatve 1
-    data.append([scale_space[1], DoG[1]])#ocatve 2
-    data.append([scale_space[2], DoG[2]])#ocatve 3
 
+    for i in range(3):
+        for x in scale_space[i]:
+            data.append(x)
+        for x in DoG[i]:
+            data.append(x)
+
+    # data.append(DoG[0])
+    # data.append(DoG[1])
+    # data.append(DoG[2])
     print data
     myFile = open(filename + '.csv', 'ab+')  # append data for all sensors
     # print "DoG Data = ",scale_space[0]
