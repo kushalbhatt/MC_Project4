@@ -36,8 +36,8 @@ def run_DTW_Generation(dataPath, savePath, Subject, Reference):
 	CSV2Memory(dataPath + Reference + "_interpolate_norm.csv", Reference_Data, Reference_N_Data)
 	CSV2Memory(dataPath + Reference + "_interpolate_norm_label.csv", Reference_Label, Reference_N_Label)
 	
-	SizeSet = [45, 23, 12]
-	DataSizeSet = [0, 405, 612]
+	SizeSet = [45, 23, 12]#each octave 1/2 each time (downscale)
+	DataSizeSet = [0, 405, 612]#45*9,43+23=68*9
 	DTW_feature = [][]#(float**)malloc(sizeof(float*) * Subject_N_Label*Reference_N_Label);
 	for i in range(0,Subject_N_Label*Reference_N_Label)
 		DTW_feature[i] = (float*)malloc(sizeof(float) * 34 * 3 * 9)
@@ -48,16 +48,17 @@ def run_DTW_Generation(dataPath, savePath, Subject, Reference):
 	subject_idx, reference_idx, i, j, iCompare
 	cdef int num_threads
 	openmp.omp_set_dynamic(1)
-	with nogil, parallel(num_threads=8):
+	#with nogil, parallel(num_threads=8):
 	#pragma omp parallel for private(subject_idx,reference_idx, iCompare)
-		for iCompare in range(0,Subject_N_Label*Reference_N_Label):
+	for iCompare in range(0,Subject_N_Label*Reference_N_Label):#iterate through all subjects and references for compare
 			i = iCompare / Reference_N_Label
 			j = iCompare % Reference_N_Label
-			for iSensor in prange(0,34):
-				for iOctave in prange(0,3):
-					for iScale in prange(0,9):
-						subject_idx = i * 24480 + iSensor * 720 + DataSizeSet[iOctave] + SizeSet[iOctave] * iScale
-						reference_idx = j * 24480 + iSensor * 720 + DataSizeSet[iOctave] + SizeSet[iOctave] * iScale
+			for iSensor in prange(0,18):#18 sensors
+				for iOctave in prange(0,3):#3 octaves per sensor
+					for iScale in prange(0,9):#9 values=4Dogs+5scale-space for each octave
+						#720*34=24480; this iterates through subjects and references
+						subject_idx = i * 12960 + iSensor * 720 + DataSizeSet[iOctave] + SizeSet[iOctave] * iScale #9DoG and SS*80=45+23+12 = 720
+						reference_idx = j * 12960 + iSensor * 720 + DataSizeSet[iOctave] + SizeSet[iOctave] * iScale
 
 						subject_one=[45]
 						reference_one=[45]
@@ -74,21 +75,21 @@ def run_DTW_Generation(dataPath, savePath, Subject, Reference):
 						MinAndMaxNorm(reference_one, SizeSet[iOctave], norm_reference_one)
 						DTW_feature[i*Reference_N_Label + j][iSensor * 27 + iOctave * 9 + iScale] = dtw_c(norm_subject_one, norm_reference_one, SizeSet[iOctave], SizeSet[iOctave])
 
-	save_fileanme = savePath + Subject+ "_" + Reference + ".csv"
-	DTW_filename = save_fileanme
+	save_filename = savePath + Subject+ "_" + Reference + ".csv"
+	DTW_filename = save_filename
 	Out_File = open(DTW_filename)
 	for m in range(0,Subject_N_Label*Reference_N_Label):
-		for n in range(0,34 * 3 * 9):
+		for n in range(0,18 * 3 * 9):
 			#newer_method_string = "{:.9f}".format(numvar)
 			Out_File.write("{:.9f}".format(DTW_feature[m][n]))
 			#Out_File << fixed << setprecision(5) << DTW_feature[m][n];
-			if (n != 34 * 3 * 9 - 1):
+			if (n != 18 * 3 * 9 - 1):
 				Out_File.write(",")
 				#Out_File << ",";
 		Out_File.write("\n")
 	Out_File.close()
 
-def CSV2Memory(filename, output_data, TotalSize):
+def CSV2Memory(filename, output_data, TotalSize):#this changes for us
 	with open(filename, 'r+') as f:
 		reader = csv.reader(f)
 		vector_Data = list(reader)
