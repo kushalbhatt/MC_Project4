@@ -51,7 +51,9 @@ for x in range(len(list)):
 		#print(list[x])
 		octave3list.append(list[x])
 for d in range(0,len(octave1list)):
-	print (octave1list[d].split(','))
+	[float(i) for i in octave1list[d].split(',')]
+for d in range(0,len(octave1list)):
+	print (octave1list[d])
 octave1list = octave1list.astype(np.float)
 octave2list = octave2list.astype(np.float)
 octave3list = octave3list.astype(np.float)
