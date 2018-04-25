@@ -118,9 +118,24 @@ def MinAndMaxNorm(input):
 main()
 num=0
 x=0
-a=[[1,2],[2,3]]
-with open("new_file.csv","w+") as my_csv:
-	csvWriter = csv.writer(my_csv,delimiter=',')
-	csvWriter.writerows(a)
+
+def MinAndMaxNorm(input):
+	output=[]
+	del output[:]
+	max_value = np.amax(input)
+	min_value = np.amin(input)
+	for i in range(0,input.size):
+		if(max_value==min_value):
+			output.append(0)
+		elif(math.isnan((input[i] - min_value) / (max_value - min_value))):
+			output.append(0)
+		else:
+			output.append((input[i] - min_value) / (max_value - min_value))
+	return output
+
+x = np.array([1,2,3])
+output1 = MinAndMaxNorm(x)
+print(output1)
+
 print (len(data1))
 print (data2[0][0][0])

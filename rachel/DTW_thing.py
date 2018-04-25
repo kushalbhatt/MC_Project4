@@ -5,6 +5,8 @@ import sys
 import csv
 import numpy as np
 import math
+from scipy.spatial.distance import euclidean
+from fastdtw import fastdtw
 
 #global variables
 datasubject=[]
@@ -57,21 +59,18 @@ def run_DTW_Generation(subjectinputfile, referenceinputfile):
 						x = np.reshape(x, (1,))
 						reference_one = x.astype(np.float)
 					
-					norm_subject_one = []
-					norm_reference_one = []
 					norm_subject_one = MinAndMaxNorm(subject_one)
-					norm_subject_one = MinAndMaxNorm(reference_one)
+					norm_reference_one = MinAndMaxNorm(reference_one)
 						#one segment to another segment is one row
 						#row is segments
 						#column is SS or DoG
-					print("row:"+str(int(iSensor/numSensors))+" col:"+str(col))
-					DTW_feature[int(iSensor/numSensors)][col]=(dtw_c(norm_subject_one, norm_reference_one))
+					#print("row:"+str(int(iSensor/numSensors))+" col:"+str(col))
+					distance, path = fastdtw(norm_subject_one, norm_reference_one, dist=euclidean)
+					DTW_feature[int(iSensor/numSensors)][col]=distance
 					if(col==(numSensors*27-1)):
 						col=0
 					else:
 						col=col+1
-					del norm_subject_one[:]
-					del norm_reference_one[:]
 
 	with open("new_file.csv","w+") as my_csv:
 		csvWriter = csv.writer(my_csv,delimiter=',')
@@ -179,13 +178,51 @@ def MinAndMaxNorm(input):
 	max_value = np.amax(input)
 	min_value = np.amin(input)
 	for i in range(0,input.size):
-		if(math.isnan((input[i] - min_value) / (max_value - min_value))):
+		if(max_value==min_value):
+			output.append(0)
+		elif(math.isnan((input[i] - min_value) / (max_value - min_value))):
 			output.append(0)
 		else:
 			output.append((input[i] - min_value) / (max_value - min_value))
 	return output
 
 def dtw_c(s, t):
+	d = 0
+	D = []
+	i=0
+	j=0
+	j1=0
+	j2=0
+	cost=0.0
+	temp=0.0
+	ns=len(s)
+	nt=len(t)
+
+	# initialization
+	D = [[-1 for x in range(nt+1)] for y in range(ns+1)]
+	
+	D[0][0] = 0;
+	
+	# dynamic programming
+	for i in range(1,ns+1):
+		j1 = 1
+		j2 = nt
+		for j in range(j1,j2+1):
+			cost = math.sqrt((s[i - 1] - t[j - 1])*(s[i - 1] - t[j - 1]))
+			print(cost)
+			temp = D[i - 1][j]
+			if (D[i][j - 1] != -1):
+				if (temp == -1 or D[i][j - 1]<temp):
+					temp = D[i][j - 1]
+			if (D[i - 1][j - 1] != -1):
+				if (temp == -1 or D[i - 1][j - 1]<temp):
+					temp = D[i - 1][j - 1]
+			
+			D[i][j] = cost + temp
+
+	d = D
+	return d;
+	'''
 	d = []
 	D=[]
 	i=0
@@ -214,10 +251,13 @@ def dtw_c(s, t):
 				if (temp == -1 or D[i - 1][j - 1]<temp):
 					temp = D[i - 1][j - 1]
 			D[i][j] = cost + temp
+			print(D[i][j])
 
 	d = D
 	return d
+	'''
 run_DTW_Generation("test.csv","text1.csv")
+#run_DTW_Generation("1491432155750.csv","1491433099844.csv")
 print (len(DTW_feature))
 '''
 if __name__ == "__main__":
