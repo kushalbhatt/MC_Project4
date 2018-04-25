@@ -1,6 +1,7 @@
 #!/usr/bin/python
 import csv
 import numpy as np
+import math
 data1=[]
 data2=[]
 
@@ -105,7 +106,21 @@ def main():
 	global data2
 	data1 = CSV2Memory("test.csv")
 	data2 = CSV2Memory("text1.csv")
+def MinAndMaxNorm(input):
+	output=[]
+	del output[:]
+	max_value = max(input)
+	min_value = min(input)
+	for i in range(0,len(input)):
+		output.append((input[i] - min_value) / (max_value - min_value))
+	return output
 
 main()
-print (data1[1][0][0])
+num=0
+x=0
+a=[[1,2],[2,3]]
+with open("new_file.csv","w+") as my_csv:
+	csvWriter = csv.writer(my_csv,delimiter=',')
+	csvWriter.writerows(a)
+print (len(data1))
 print (data2[0][0][0])
