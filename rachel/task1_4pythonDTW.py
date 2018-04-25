@@ -19,7 +19,7 @@ def main():
 	Subject = "CSE572_G02";
 	Reference = "CSE572_G04";
 
-def run_DTW_Generation(subjectinputfile, referenceinputfile):
+def run_DTW_Generation(subjectinputfile, referenceinputfile, outputfile):
 	numSensors=1
 	global datasubject
 	global datareference
@@ -30,47 +30,51 @@ def run_DTW_Generation(subjectinputfile, referenceinputfile):
 	DTW_feature = [ [ None for i in range(numSensors*27) ] for j in range(int(len(datareference)/numSensors)*int(len(datasubject)/numSensors)) ]
 	col=0
 	for iSensor in range(0,((len(datasubject)*int(len(datareference)/numSensors)))):#iterate through all subjects and references for compare
-			for iOctave in range(0,3):#3 octaves per sensor
-				for iScale in range(0,9):#9 values=4Dogs+5scale-space for each octave
-					#produce float array from each string SS or DoG saved in 3D data array
-					#subject SS/DoG
-					num=0
-					x=0
-					subject_one=[]
-					item=datasubject[iSensor%(len(datasubject))][iOctave][iScale]
-					if ',' in item:
-						x = np.fromstring(item, dtype=float, sep=',')
-						subject_one = x.astype(np.float)
-					else:
-						x = np.array(item)
-						x = np.reshape(x, (1,))
-						subject_one = x.astype(np.float)
-					#reference SS/DoG
-					num=0
-					x=0
-					reference_one=[]
-					item=datareference[(iSensor%numSensors)+(int(iSensor/len(datasubject))*numSensors)][iOctave][iScale]
-					if ',' in item:
-						x = np.fromstring(item, dtype=float, sep=',')
-						reference_one = x.astype(np.float)
-					else:
-						x = np.array(item)
-						x = np.reshape(x, (1,))
-						reference_one = x.astype(np.float)
-					norm_subject_one = MinAndMaxNorm(subject_one)
-					norm_reference_one = MinAndMaxNorm(reference_one)
-					
-						#one segment to another segment is one row
-						#row is segments
-						#column is SS or DoG
-					distance, path = fastdtw(norm_subject_one, norm_reference_one, dist=euclidean)
-					DTW_feature[int(iSensor/numSensors)][col]=distance
-					if(col==(numSensors*27-1)):
-						col=0
-					else:
-						col=col+1
+		for iOctave in range(0,3):#3 octaves per sensor
+			for iScale in range(0,9):#9 values=4Dogs+5scale-space for each octave
+				#produce float array from each string SS or DoG saved in 3D data array
+				#subject SS/DoG
+				num=0
+				x=0
+				subject_one=[]
+				#print("subject")
+				#print(iSensor%(len(datasubject)))
+				item=datasubject[iSensor%(len(datasubject))][iOctave][iScale]
+				if ',' in item:
+					x = np.fromstring(item, dtype=float, sep=',')
+					subject_one = x.astype(np.float)
+				else:
+					x = np.array(item)
+					x = np.reshape(x, (1,))
+					subject_one = x.astype(np.float)
+				#reference SS/DoG
+				num=0
+				x=0
+				reference_one=[]
+				#print ("reference")
+				#print((iSensor%numSensors)+(int(iSensor/len(datasubject))*numSensors))
+				item=datareference[(iSensor%numSensors)+(int(iSensor/len(datasubject))*numSensors)][iOctave][iScale]
+				if ',' in item:
+					x = np.fromstring(item, dtype=float, sep=',')
+					reference_one = x.astype(np.float)
+				else:
+					x = np.array(item)
+					x = np.reshape(x, (1,))
+					reference_one = x.astype(np.float)
+				norm_subject_one = MinAndMaxNorm(subject_one)
+				norm_reference_one = MinAndMaxNorm(reference_one)
+				
+					#one segment to another segment is one row
+					#row is segments
+					#column is SS or DoG
+				distance, path = fastdtw(norm_subject_one, norm_reference_one, dist=euclidean)
+				DTW_feature[int(iSensor/numSensors)][col]=distance
+				if(col==(numSensors*27-1)):
+					col=0
+				else:
+					col=col+1
 							
-	with open("DTW_matrix.csv","w+") as my_csv:
+	with open(outputfile,"w+") as my_csv:
 		csvWriter = csv.writer(my_csv,delimiter=',')
 		csvWriter.writerows(DTW_feature)
 
@@ -220,8 +224,14 @@ def dtw_c(s, t):
 	d = D
 	return d;
 
-run_DTW_Generation("test1.csv","test2.csv")
-#run_DTW_Generation("1491432155750.csv","1491433099844.csv")
+run_DTW_Generation("test1.csv","test2.csv","DTW_matrix1_test.csv")
+#run_DTW_Generation("test2.csv","test1.csv","DTW_matrix2_test.csv")
+#run_DTW_Generation("Donor1.csv","Donor2.csv","DTW1v2.csv")
+#run_DTW_Generation("Donor1.csv","Donor3.csv","DTW1v3.csv")
+#run_DTW_Generation("Donor2.csv","Donor1.csv","DTW2v1.csv")
+#run_DTW_Generation("Donor2.csv","Donor3.csv","DTW2v3.csv")
+#run_DTW_Generation("Donor3.csv","Donor1.csv","DTW3v1.csv")
+#run_DTW_Generation("Donor3.csv","Donor2.csv","DTW3v2.csv")
 #print (len(DTW_feature))
 '''
 if __name__ == "__main__":

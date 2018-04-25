@@ -48,32 +48,32 @@ def run_DTW_Generation(dataPath, savePath, Subject, Reference):
 	subject_idx, reference_idx, i, j, iCompare
 	cdef int num_threads
 	openmp.omp_set_dynamic(1)
-	#with nogil, parallel(num_threads=8):
-	#pragma omp parallel for private(subject_idx,reference_idx, iCompare)
+	with nogil, parallel(num_threads=8):
+	pragma omp parallel for private(subject_idx,reference_idx, iCompare)
 	for iCompare in range(0,Subject_N_Label*Reference_N_Label):#iterate through all subjects and references for compare
-			i = iCompare / Reference_N_Label
-			j = iCompare % Reference_N_Label
-			for iSensor in prange(0,18):#18 sensors
-				for iOctave in prange(0,3):#3 octaves per sensor
-					for iScale in prange(0,9):#9 values=4Dogs+5scale-space for each octave
-						#720*34=24480; this iterates through subjects and references
-						subject_idx = i * 12960 + iSensor * 720 + DataSizeSet[iOctave] + SizeSet[iOctave] * iScale #9DoG and SS*80=45+23+12 = 720
-						reference_idx = j * 12960 + iSensor * 720 + DataSizeSet[iOctave] + SizeSet[iOctave] * iScale
+		i = iCompare / Reference_N_Label
+		j = iCompare % Reference_N_Label
+		for iSensor in prange(0,18):#18 sensors
+			for iOctave in prange(0,3):#3 octaves per sensor
+				for iScale in prange(0,9):#9 values=4Dogs+5scale-space for each octave
+					#720*34=24480; this iterates through subjects and references
+					subject_idx = i * 12960 + iSensor * 720 + DataSizeSet[iOctave] + SizeSet[iOctave] * iScale #9DoG and SS*80=45+23+12 = 720
+					reference_idx = j * 12960 + iSensor * 720 + DataSizeSet[iOctave] + SizeSet[iOctave] * iScale
 
-						subject_one=[45]
-						reference_one=[45]
+					subject_one=[45]
+					reference_one=[45]
 
-						norm_subject_one=[45]
-						norm_reference_one=[45]
-					
-						for m in range(0,SizeSet[iOctave]):
-							subject_one[m] = Subject_Data[subject_idx + m]
-							reference_one[m] = Reference_Data[reference_idx + m]
+					norm_subject_one=[45]
+					norm_reference_one=[45]
+				
+					for m in range(0,SizeSet[iOctave]):
+						subject_one[m] = Subject_Data[subject_idx + m]
+						reference_one[m] = Reference_Data[reference_idx + m]
 
-					
-						MinAndMaxNorm(subject_one, SizeSet[iOctave], norm_subject_one)
-						MinAndMaxNorm(reference_one, SizeSet[iOctave], norm_reference_one)
-						DTW_feature[i*Reference_N_Label + j][iSensor * 27 + iOctave * 9 + iScale] = dtw_c(norm_subject_one, norm_reference_one, SizeSet[iOctave], SizeSet[iOctave])
+
+					MinAndMaxNorm(subject_one, SizeSet[iOctave], norm_subject_one)
+					MinAndMaxNorm(reference_one, SizeSet[iOctave], norm_reference_one)
+					DTW_feature[i*Reference_N_Label + j][iSensor * 27 + iOctave * 9 + iScale] = dtw_c(norm_subject_one, norm_reference_one, SizeSet[iOctave], SizeSet[iOctave])
 
 	save_filename = savePath + Subject+ "_" + Reference + ".csv"
 	DTW_filename = save_filename
