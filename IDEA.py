@@ -50,8 +50,8 @@ def main():
     sensor18 = []
 
 
-    f = open("K:/ASU/MC/project_data/"+EMG_Files[9], 'r')
-    print "reading file = ",EMG_Files[9]
+    f = open("K:/ASU/MC/project_data/"+EMG_Files[6], 'r')
+    print "reading file = ",EMG_Files[6]
     s = f.readline()
     while(s):
         s = s.strip('\n')
@@ -71,7 +71,7 @@ def main():
 
         s = f.readline()
 
-    f = open("K:/ASU/MC/project_data/" + IMU_files[9], 'r')
+    f = open("K:/ASU/MC/project_data/" + IMU_files[6], 'r')
     s = f.readline()
     while (s):
         s = s.strip('\n')
@@ -100,7 +100,7 @@ def main():
     csv file name would be same as sensor data file name.... except for EMG and IMU parts...
 
     '''
-    output_filename = EMG_Files[9][:-8]#remove EMG.txt
+    output_filename = EMG_Files[6][:-8]#remove EMG.txt
 
     '''
         TODO://  This is where extrema based segmentation takes place!!!!!
@@ -167,6 +167,9 @@ def main():
 
     segments = [(2805,3026),(4114,4331),(1321,1523),(3197,3390),(2424,2803)] #manually tracked from sensor signal plot
 
+    # #get Test User Segments
+    # segments = [(1577, 1922),(6614,6987) , (5165,5586), (8868,9237),(3250,3587)] #manually tracked from sensor signal plot
+    # output_filename+='_testUser'
     for segment in segments:
         #print sensor1[segment[0]:segment[1]],"\nlength = ",len(sensor1[segment[0]:segment[1]])
         write_scale_space_to_file(output_filename,sensor1[segment[0]:segment[1]])
