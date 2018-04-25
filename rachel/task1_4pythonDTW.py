@@ -27,9 +27,7 @@ def run_DTW_Generation(subjectinputfile, referenceinputfile):
 	
 	datasubject = CSV2Memory(subjectinputfile)
 	datareference = CSV2Memory(referenceinputfile)
-	#DTW_feature = defaultdict(list)
-	DTW_feature = [ [ None for i in range(numSensors*27) ] for j in range(int(len(datareference)/numSensors)*int(len(datasubject)/numSensors)) ]#[[None]*numSensors*27]*int(len(datareference)/numSensors)*int(len(datasubject)/numSensors)
-	#what I want to do: there are 486 columns, where it is 27*18, where each 27 from subject and reference are compared
+	DTW_feature = [ [ None for i in range(numSensors*27) ] for j in range(int(len(datareference)/numSensors)*int(len(datasubject)/numSensors)) ]
 	col=0
 	for iSensor in range(0,((len(datasubject)*int(len(datareference)/numSensors)))):#iterate through all subjects and references for compare
 			for iOctave in range(0,3):#3 octaves per sensor
@@ -39,12 +37,6 @@ def run_DTW_Generation(subjectinputfile, referenceinputfile):
 					num=0
 					x=0
 					subject_one=[]
-					'''
-					print("subject")
-					print("isensor "+str(iSensor%(len(datasubject))))
-					print("octave "+str(iOctave))
-					print("scale "+str(iScale))
-					'''
 					item=datasubject[iSensor%(len(datasubject))][iOctave][iScale]
 					if ',' in item:
 						x = np.fromstring(item, dtype=float, sep=',')
@@ -57,12 +49,6 @@ def run_DTW_Generation(subjectinputfile, referenceinputfile):
 					num=0
 					x=0
 					reference_one=[]
-					'''
-					print("reference")
-					print("isensor "+str((iSensor%numSensors)+(int(iSensor/len(datasubject))*numSensors)))
-					print("octave "+str(iOctave))
-					print("scale "+str(iScale))
-					'''
 					item=datareference[(iSensor%numSensors)+(int(iSensor/len(datasubject))*numSensors)][iOctave][iScale]
 					if ',' in item:
 						x = np.fromstring(item, dtype=float, sep=',')
@@ -71,28 +57,20 @@ def run_DTW_Generation(subjectinputfile, referenceinputfile):
 						x = np.array(item)
 						x = np.reshape(x, (1,))
 						reference_one = x.astype(np.float)
-							#print(subject_one)
-							#print(reference_one)
 					norm_subject_one = MinAndMaxNorm(subject_one)
 					norm_reference_one = MinAndMaxNorm(reference_one)
-						#print(norm_subject_one)
-						#print(norm_reference_one)
+					
 						#one segment to another segment is one row
 						#row is segments
 						#column is SS or DoG
-					#print("row:"+str(int(iSensor/numSensors))+" col:"+str(col))
 					distance, path = fastdtw(norm_subject_one, norm_reference_one, dist=euclidean)
 					DTW_feature[int(iSensor/numSensors)][col]=distance
-					print(int(iSensor/numSensors))
-					print(col)
-					#print(DTW_feature[int(iSensor/numSensors)][col])
 					if(col==(numSensors*27-1)):
 						col=0
 					else:
 						col=col+1
-					print(DTW_feature)
 							
-	with open("new_file.csv","w+") as my_csv:
+	with open("DTW_matrix.csv","w+") as my_csv:
 		csvWriter = csv.writer(my_csv,delimiter=',')
 		csvWriter.writerows(DTW_feature)
 
@@ -241,43 +219,10 @@ def dtw_c(s, t):
 
 	d = D
 	return d;
-	'''
-	d = []
-	D=[]
-	i=0
-	j=0
-	j1=0
-	j2=0
-	cost=0.0
-	temp=0.0
-	
-	#initialization
-	D = [[0 for x in range(len(t)+1)] for y in range(len(s)+1)]
-	D[0][0] = 0;
-	
-	# dynamic programming
-	for i in range(1,(len(s)+1)):#<=
-		j1 = 1
-		j2 = (len(t))
-		
-		for j in range (j1,j2+1):#<=
-			cost = math.sqrt((s[i - 1] - t[j - 1])*(s[i - 1] - t[j - 1]))
-			temp = D[i - 1][j]
-			if (D[i][j - 1] != -1):
-				if (temp == -1 or D[i][j - 1]<temp):
-					temp = D[i][j - 1]
-			if (D[i - 1][j - 1] != -1):
-				if (temp == -1 or D[i - 1][j - 1]<temp):
-					temp = D[i - 1][j - 1]
-			D[i][j] = cost + temp
-			print(D[i][j])
 
-	d = D
-	return d
-	'''
-run_DTW_Generation("test.csv","text1.csv")
+run_DTW_Generation("test1.csv","test2.csv")
 #run_DTW_Generation("1491432155750.csv","1491433099844.csv")
-print (len(DTW_feature))
+#print (len(DTW_feature))
 '''
 if __name__ == "__main__":
 	main()'''
