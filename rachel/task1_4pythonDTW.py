@@ -232,6 +232,7 @@ run_DTW_Generation("test1.csv","test2.csv","DTW_matrix1_test.csv")
 #run_DTW_Generation("Donor2.csv","Donor3.csv","DTW2v3.csv")
 #run_DTW_Generation("Donor3.csv","Donor1.csv","DTW3v1.csv")
 #run_DTW_Generation("Donor3.csv","Donor2.csv","DTW3v2.csv")
+run_DTW_Generation("testUser.csv","input_DTW_donorEvE.csv","DTW_TESTvDonorEE.csv")
 #print (len(DTW_feature)
 '''
     d = 0
